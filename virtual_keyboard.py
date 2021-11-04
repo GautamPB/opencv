@@ -26,6 +26,10 @@ keys = [['Q', 'W', 'E', 'R', 'T', 'Y', 'U','I', 'O', 'P'],
 
 buttonList = []
 
+for i in range(len(keys)):
+        for j, key in enumerate(keys[i]):
+            buttonList.append(Button([100 * j + 50, 100 * i + 50], key))
+
 detector = HandDetector(detectionCon=1)
 
 while True:
@@ -33,12 +37,17 @@ while True:
 
     frame = detector.findHands(frame)
     lmList, bboxInfo = detector.findPosition(frame)
-
-    for i in range(len(keys)):
-        for j, key in enumerate(keys[i]):
-            buttonList.append(Button([100 * j + 50, 100 * i + 50], key))
     
     frame = drawButtons(frame, buttonList)
+
+    if lmList:
+        for button in buttonList:
+            x, y = button.pos
+            w, h = button.size
+
+            if (x < lmList[8][0] < x + w and y < lmList[8][1] < y + h):
+                cv.rectangle(frame, button.pos, [x + w, y + h], (0, 255, 0), -1)
+                cv.putText(frame, button.text, (x + 15, y + 70), cv.FONT_HERSHEY_PLAIN, 5, (255, 255, 255), 5)                
 
     cv.imshow('Camera', frame)
 
