@@ -5,18 +5,26 @@ cap = cv.VideoCapture(0)
 cap.set(3, 1280)
 cap.set(4, 720)
 
+def drawButtons(frame, buttonList):
+    for button in buttonList:
+        x, y = button.pos
+        w, h = button.size
+        cv.rectangle(frame, button.pos, [x + w, y + h], (255, 0, 255), -1)
+        cv.putText(frame, button.text, (x + 15, y + 70), cv.FONT_HERSHEY_PLAIN, 5, (255, 255, 255), 5)
+    return frame
+
 class Button:
-    def __init__(self, pos, text, size = [100, 100]):
+    def __init__(self, pos, text, size = [85, 85]):
         self.pos = pos
         self.text = text
         self.size = size
-        
-    def draw(self, frame):
-        x, y = self.pos
-        w, h = self.size
-        cv.rectangle(frame, self.pos, [x + w, y + h], (255, 0, 255), -1)
-        cv.putText(frame, self.text, (x + 25, y + 25), cv.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255))
-        return frame
+    
+
+keys = [['Q', 'W', 'E', 'R', 'T', 'Y', 'U','I', 'O', 'P'],
+['A', 'S', 'D', 'F', 'G', 'H', 'J','K', 'L', ';'],
+['Z', 'X', 'C', 'V', 'B', 'N', 'M',',', '.', '/']]
+
+buttonList = []
 
 detector = HandDetector(detectionCon=1)
 
@@ -26,8 +34,11 @@ while True:
     frame = detector.findHands(frame)
     lmList, bboxInfo = detector.findPosition(frame)
 
-    button = Button([100, 100], 'Q')
-    frame = button.draw(frame)
+    for i in range(len(keys)):
+        for j, key in enumerate(keys[i]):
+            buttonList.append(Button([100 * j + 50, 100 * i + 50], key))
+    
+    frame = drawButtons(frame, buttonList)
 
     cv.imshow('Camera', frame)
 
